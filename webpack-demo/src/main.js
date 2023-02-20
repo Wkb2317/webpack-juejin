@@ -3,18 +3,15 @@ import "./static/css/box2.less";
 import "./static/css/style.scss";
 import "./static/font/iconfont";
 
-const sum = (...args) => {
-  return args.reduce((pre, current) => {
-    return pre + current;
-  }, 0);
-};
+import { sum } from "./utils/sum";
+console.log(sum(1, 2, 3));
 
-new Promise((resolve, reject) => {
+if (module.hot) {
+  module.hot.accept("./utils/sum.js");
+}
+
+new Promise((resolve) => {
   setTimeout(() => {
     resolve(1);
   }, 1000);
 });
-
-sum(1, 2, 3);
-
-console.log("hello webpack");

@@ -4,6 +4,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const EslintWebpackPlugin = require("eslint-webpack-plugin");
 
 module.exports = {
   // 模式
@@ -18,6 +19,7 @@ module.exports = {
     // 打包前清空dist目录
     clean: true,
   },
+  devtool: "eval-cheap-module-source-map",
   // 开发模式
   devServer: {
     // 自动打开浏览器
@@ -101,5 +103,10 @@ module.exports = {
     }),
     new CssMinimizerPlugin(),
     new TerserPlugin(),
+    new EslintWebpackPlugin({
+      context: path.resolve(__dirname, "./src"),
+      cache: true, // 开启缓
+      cacheLocation: path.resolve(__dirname, "./node_modules/.cache/.eslintcache"),
+    }),
   ],
 };
