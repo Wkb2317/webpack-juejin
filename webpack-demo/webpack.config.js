@@ -39,40 +39,46 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
-      },
-      {
-        test: /\.less$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader", "less-loader"],
-      },
-      {
-        test: /\.s[ac]ss$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader", "sass-loader"],
-      },
-      {
-        test: /\.(png|jpe?g|gif)$/i,
-        type: "asset/resource",
-        generator: {
-          filename: "static/[hash][ext][query]",
-        },
-      },
-      {
-        test: /\.(ttf|woff|woff2)$/i,
-        type: "asset/resource",
-        generator: {
-          filename: "static/[hash][ext][query]",
-        },
-      },
-      {
-        test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: [
+        oneOf: [
           {
-            loader: "babel-loader",
-            options: {
-              cacheDirectory: true,
+            test: /\.css$/,
+            use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
+          },
+          {
+            test: /\.less$/,
+            use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader", "less-loader"],
+          },
+          {
+            test: /\.s[ac]ss$/i,
+            use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader", "sass-loader"],
+          },
+          {
+            test: /\.(png|jpe?g|gif)$/i,
+            type: "asset/resource",
+            generator: {
+              filename: "static/[hash][ext][query]",
             },
+          },
+          {
+            test: /\.(ttf|woff|woff2)$/i,
+            type: "asset/resource",
+            generator: {
+              filename: "static/[hash][ext][query]",
+            },
+          },
+          {
+            test: /\.m?js$/,
+            exclude: /(node_modules|bower_components)/,
+            use: [
+              "thread-loader",
+              {
+                loader: "babel-loader",
+                options: {
+                  cacheDirectory: true,
+                  include: path.resolve(__dirname, "./src"),
+                },
+              },
+            ],
           },
         ],
       },
@@ -105,6 +111,7 @@ module.exports = {
     new TerserPlugin(),
     new EslintWebpackPlugin({
       context: path.resolve(__dirname, "./src"),
+      exclude: "node_modules",
       cache: true, // 开启缓
       cacheLocation: path.resolve(__dirname, "./node_modules/.cache/.eslintcache"),
     }),
