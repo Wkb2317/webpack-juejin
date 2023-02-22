@@ -4,4 +4,8 @@ const sum = (...args) => {
   }, 0);
 };
 
-export { sum };
+const dec = () => {
+  console.log("1");
+};
+
+export { sum, dec };

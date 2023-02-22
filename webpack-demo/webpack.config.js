@@ -5,21 +5,25 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const EslintWebpackPlugin = require("eslint-webpack-plugin");
+const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
+const WorkboxPlugin = require("workbox-webpack-plugin");
 
 module.exports = {
   // 模式
-  mode: "development",
+  mode: "production",
   // 入口文件
   entry: "./src/main.js",
   // 输入配置
   output: {
-    filename: "[name].js",
+    filename: "js/[name].[contenthash:10].js",
     path: path.resolve(__dirname, "./dist"),
-    assetModuleFilename: "static/[hash][ext][query]",
+    assetModuleFilename: "static/[name][hash][ext][query]",
+    // 动态加载路径
+    chunkFilename: "js/[name].[contenthash:10].chunk.js",
     // 打包前清空dist目录
     clean: true,
   },
-  devtool: "eval-cheap-module-source-map",
+  devtool: "source-map",
   // 开发模式
   devServer: {
     // 自动打开浏览器
@@ -56,7 +60,7 @@ module.exports = {
             test: /\.(png|jpe?g|gif)$/i,
             type: "asset/resource",
             generator: {
-              filename: "static/[hash][ext][query]",
+              filename: "static/[name][hash][ext][query]",
             },
           },
           {
@@ -105,7 +109,8 @@ module.exports = {
       ],
     }),
     new MiniCssExtractPlugin({
-      filename: "static/css/[name].css",
+      filename: "static/css/[name].[contenthash:10].css",
+      chunkFilename: "static/css/[name].[contenthash:10].chunk.css",
     }),
     new CssMinimizerPlugin(),
     new TerserPlugin(),
@@ -115,5 +120,25 @@ module.exports = {
       cache: true, // 开启缓
       cacheLocation: path.resolve(__dirname, "./node_modules/.cache/.eslintcache"),
     }),
+    new PreloadWebpackPlugin({
+      rel: "preload", // preload兼容性更好
+      as: "script",
+      // rel: 'prefetch' // prefetch兼容性更差
+    }),
+    new WorkboxPlugin.GenerateSW({
+      // 这些选项帮助快速启用 ServiceWorkers
+      // 不允许遗留任何“旧的” ServiceWorkers
+      clientsClaim: true,
+      skipWaiting: true,
+    }),
   ],
+  // 优化
+  optimization: {
+    splitChunks: {
+      chunks: "all", // 对所有模块都分割
+    },
+    runtimeChunk: {
+      name: (entryPoint) => `runtime~${entryPoint.name}`,
+    },
+  },
 };
